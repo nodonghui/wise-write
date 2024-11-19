@@ -1,5 +1,6 @@
 import Input.CommandInput;
 import delete.EnrollDelete;
+import modify.EnrollModify;
 import registration.Enroll;
 
 import java.io.BufferedReader;
@@ -14,6 +15,7 @@ public class Application {
 
     static CommandInput commandInput =new CommandInput();
     static EnrollDelete enrollDelete = new EnrollDelete();
+    static EnrollModify enrollModify= new EnrollModify();
 
     static String inputValue;
     static BufferedReader br;
@@ -35,6 +37,7 @@ public class Application {
                 if(inputValue.equals("등록")) { enrollProcess(); }
                 if(inputValue.equals("목록")) { viewProcess(); }
                 if(inputValue.startsWith("삭제")) { deleteProcess(); }
+                if(inputValue.startsWith("수정")) { modifyProcess(); }
             } catch (IOException e) {
                 System.err.print(e.getMessage());
             }
@@ -88,6 +91,24 @@ public class Application {
 
     }
 
+
+
+    public static void modifyProcess() {
+        String cmd=inputValue;
+
+        try {
+            int serialNum=splitData(cmd);
+            enrollModify.modifyData(serialNum,enrolls);
+            System.out.println(serialNum+"번 명언이 수정되었습니다.");
+        } catch (NumberFormatException e) {
+            System.out.println("삭제 명령어 형식을 맞춰주세요");
+        }
+        catch (IllegalArgumentException | IOException e) {
+            System.out.println(e.getMessage());
+        }
+
+    }
+
     public static int splitData(String cmd) {
         String[] splitData1=inputValue.split("\\?");
         if(splitData1.length !=2) {throw new IllegalArgumentException("삭제 명령어 형식을 맞춰주세요.");}
@@ -96,6 +117,5 @@ public class Application {
 
         return Integer.parseInt(splitData2[1]);
     }
-
 
 }

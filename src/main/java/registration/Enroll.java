@@ -3,12 +3,20 @@ package registration;
 public class Enroll {
 
     final int serialNum;
-    final String line;
-    final String writer;
+    String line;
+    String writer;
     public Enroll(int serialNum,String line,String writer) {
         this.line=line;
         this.writer=writer;
         this.serialNum=serialNum;
+    }
+
+    public void setLine(String line) {
+        this.line=line;
+    }
+
+    public void setWriter(String writer) {
+        this.writer=writer;
     }
 
     public int getSerialNum(){
