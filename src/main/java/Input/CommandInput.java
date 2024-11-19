@@ -11,8 +11,8 @@ public class CommandInput {
     public String userInput() throws IOException {
         BufferedReader br=new BufferedReader(new InputStreamReader(System.in));
 
-        System.out.print("명령) ");
         inputValue=br.readLine();
+        //필요시 입력에 대한 예외처리
 
         return inputValue;
     }
