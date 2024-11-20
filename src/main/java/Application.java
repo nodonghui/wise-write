@@ -1,11 +1,14 @@
 import Input.CommandInput;
 import delete.EnrollDelete;
+import init.LoadWiseWriteList;
 import modify.EnrollModify;
 import registration.Enroll;
+import reset.ResetDatabase;
+import updateDatabase.DeleteEnroll;
+import updateDatabase.WriteEnroll;
+import updateDatabase.WriteId;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -16,6 +19,11 @@ public class Application {
     static CommandInput commandInput =new CommandInput();
     static EnrollDelete enrollDelete = new EnrollDelete();
     static EnrollModify enrollModify= new EnrollModify();
+    static WriteId writeId=new WriteId();
+    static WriteEnroll writeEnroll=new WriteEnroll();
+    static DeleteEnroll deleteEnroll=new DeleteEnroll();
+    static ResetDatabase resetDatabase=new ResetDatabase();
+    static LoadWiseWriteList loadWiseWriteList=new LoadWiseWriteList();
 
     static String inputValue;
     static BufferedReader br;
@@ -33,11 +41,15 @@ public class Application {
                 System.out.print("명령) ");
                 inputValue=commandInput.userInput();
 
-                if(inputValue.equals("종료")) { break; }
+                if(inputValue.equals("종료")) {
+                    writeId.makeFile(id-1);
+                    break;
+                }
                 if(inputValue.equals("등록")) { enrollProcess(); }
                 if(inputValue.equals("목록")) { viewProcess(); }
                 if(inputValue.startsWith("삭제")) { deleteProcess(); }
                 if(inputValue.startsWith("수정")) { modifyProcess(); }
+                if(inputValue.equals("초기화")) { resetProcess(); break;}
             } catch (IOException e) {
                 System.err.print(e.getMessage());
             }
@@ -49,8 +61,13 @@ public class Application {
 
     public static void init(){
         br=new BufferedReader(new InputStreamReader(System.in));
-        id=1;
-        enrolls=new LinkedHashMap<>();
+
+        id=writeId.loadFile();
+        if(id==-1) {
+            id=1;
+        }
+
+        enrolls=loadWiseWriteList.loadEnrolls();
     }
 
 
@@ -59,10 +76,11 @@ public class Application {
         String line=br.readLine();
         System.out.print("작가 : ");
         String writer= br.readLine();
-
-        enrolls.put(id,new Enroll(id,line,writer));
+        Enroll enroll=new Enroll(id,line,writer);
+        enrolls.put(id,enroll);
         System.out.println(id+"번 명언이 등록되었습니다.");
         id+=1;
+        writeEnroll.wirteFile(enroll);
 
     }
 
@@ -79,9 +97,11 @@ public class Application {
         String cmd=inputValue;
 
         try {
-            int serialNum=splitData(cmd);
-            enrollDelete.deleteData(serialNum,enrolls);
-            System.out.println(serialNum+"번 명언이 삭제되었습니다.");
+            int id=splitData(cmd);
+            enrollDelete.deleteData(id,enrolls);
+            System.out.println(id+"번 명언이 삭제되었습니다.");
+            deleteEnroll.deleteDatabaseData(id);
+
         } catch (NumberFormatException e) {
             System.out.println("삭제 명령어 형식을 맞춰주세요");
         }
@@ -97,9 +117,12 @@ public class Application {
         String cmd=inputValue;
 
         try {
-            int serialNum=splitData(cmd);
-            enrollModify.modifyData(serialNum,enrolls);
-            System.out.println(serialNum+"번 명언이 수정되었습니다.");
+            int id=splitData(cmd);
+            enrollModify.modifyData(id,enrolls);
+            Enroll enroll=enrolls.get(id);
+            System.out.println(id+"번 명언이 수정되었습니다.");
+            //수정된 내용 db반영
+            writeEnroll.wirteFile(enroll);
         } catch (NumberFormatException e) {
             System.out.println("삭제 명령어 형식을 맞춰주세요");
         }
@@ -117,5 +140,12 @@ public class Application {
 
         return Integer.parseInt(splitData2[1]);
     }
+
+    public static void resetProcess() {
+        resetDatabase.reset();
+        enrolls.clear();
+    }
+
+
 
 }

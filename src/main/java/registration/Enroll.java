@@ -2,13 +2,13 @@ package registration;
 
 public class Enroll {
 
-    final int serialNum;
+    final int id;
     String line;
     String writer;
-    public Enroll(int serialNum,String line,String writer) {
+    public Enroll(int id,String line,String writer) {
         this.line=line;
         this.writer=writer;
-        this.serialNum=serialNum;
+        this.id=id;
     }
 
     public void setLine(String line) {
@@ -19,8 +19,8 @@ public class Enroll {
         this.writer=writer;
     }
 
-    public int getSerialNum(){
-        return serialNum;
+    public int getId(){
+        return id;
     }
 
     public String getLine(){
@@ -32,7 +32,7 @@ public class Enroll {
     }
 
     public String toString() {
-        String printEnroll=serialNum + " / " + writer + " / " + line;
+        String printEnroll=id + " / " + writer + " / " + line;
         return printEnroll;
     }
 }
